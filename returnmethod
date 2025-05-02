@@ -1,0 +1,135 @@
+private static void returnbook() throws IOException {
+		String status = "";
+
+	    File inputFile = new File("C:\\Users\\Kobe\\Downloads\\OriginalBooks.txt");
+
+		BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\Kobe\\Downloads\\OriginalBooks.txt"));
+		
+		   String parts;
+		    System.out.println("BookId |" + " Genre  |" + " Title |" + " Author |" + " Status");
+		    while ((parts = reader.readLine()) != null) {
+		        String[] arr = parts.split("\\*");
+		        if (arr.length >= 5 &&  arr[4].equalsIgnoreCase("OUT")) {
+		            System.out.println(arr[0] + " \t" + arr[1] + " \t " + arr[2] + " \t" + arr[3] + "\t" + arr[4]);
+					status = "OUT";
+		        }
+	}
+		    reader.close();
+
+
+		
+		double totalPenalty = 0.00;
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	    LocalDate today = LocalDate.now();
+	   	
+    File tempFile = new File("temp.txt");
+	BufferedReader Filereader = new BufferedReader(new FileReader("C:\\Users\\Kobe\\Downloads\\OriginalBooks.txt"));
+	BufferedWriter tempWriter = new BufferedWriter(new FileWriter(tempFile));
+	String win;
+	while((win = Filereader.readLine()) != null) {
+		tempWriter.write(win +"\n");			//NALIPAT NA SA TEMP
+	}
+	
+	Filereader.close();
+	tempWriter.close();
+	
+	
+	System.out.println("ENTER THE BOOK ID TO RETURN:} ");
+	String booktoreturn = scan.next();
+		
+	BufferedReader Tempreader = new BufferedReader(new FileReader(tempFile));
+	BufferedWriter FileWriter = new BufferedWriter(new FileWriter("C:\\\\Users\\\\Kobe\\\\Downloads\\\\OriginalBooks.txt.temp"));//I REMOVE YUNG .temp
+	
+	String line;
+	while((line = Tempreader.readLine()) != null) {
+		String[] arr = line.split("\\*");
+		
+		if(booktoreturn.equals(arr[0]) && status.equalsIgnoreCase("OUT")) {
+			System.out.println("Book Succesfully Returned! ");
+			arr[4] = "AVAILABLE";
+		     String updatedLine = arr[0] + "*" + arr[1] + "*" + arr[2] + "*" + arr[3] + "*" + arr[4] + "*";
+		        FileWriter.write(updatedLine + "\n");
+		        
+		        File borrowFile = new File("C:\\Users\\Kobe\\Downloads\\Borrow&Due.txt");
+				BufferedReader borrowreader = new BufferedReader(new FileReader(borrowFile));
+				String link;
+				
+				while((link = borrowreader.readLine())!= null) {
+					String[] hati = link.split("\\*");
+					
+					String fullText = hati[2];
+					String duedateStr = fullText.substring(9, 19); // Extract "2025-05-03" 
+					LocalDate duedate = LocalDate.parse(duedateStr);	
+					
+				     if(booktoreturn.equals(hati[0])) {
+				    	 if (today.isAfter(duedate)) {
+				             System.out.println("The book is returned late.");
+				         } else if (today.isEqual(duedate)) {
+				             System.out.println("The book is returned on the due date.");
+				         } else {
+				             System.out.println("The book is returned early.");
+				         }
+						 long daysLate = ChronoUnit.DAYS.between(duedate, today);
+					        totalPenalty = daysLate * 100;
+							System.out.println("YOUR PENALTY IS: " + totalPenalty);
+					       	
+					       	limit--;
+					       	
+					        File receiptFile = new File("C:\\Users\\Kobe\\Downloads\\RECEIPT.txt");
+				            BufferedWriter ReceiptWriter = new BufferedWriter(new FileWriter(receiptFile, true));
+					           
+							
+							   System.out.println( "---Return BOOOK RECEIPT--- \n" +
+							             "Student ID: " + arr[0] + "*" + "\n" +
+							             "Student Name: " + arr[1] + "*" + "\n" +
+							             "Book ID" + arr[2] +  "*" + "\n" +
+							             "Book Title: " + arr[3] +  "*" + "\n" +
+							             "Book Author: " + arr[4] +  "*" + "\n" +
+							             "Penalty: " + totalPenalty) ;
+
+					           ReceiptWriter.write( "---Return BOOOK RECEIPT--- \n" +
+					           "Student ID: " + arr[0] + "*" + "\n" +
+					           "Student Name: " + arr[1] + "*" + "\n" +
+					           "Book ID" + arr[2] +  "*" + "\n" +
+					           "Book Title: " + arr[3] +  "*" + "\n" +
+					           "Book Author: " + arr[4] +  "*" + "\n" +
+					           "Penalty: " + totalPenalty) ;
+					           
+					           ReceiptWriter.close();
+
+					}else {
+					    File receiptFile = new File("C:\\Users\\Kobe\\Downloads\\RECEIPT.txt");
+			            BufferedWriter ReceiptWriter = new BufferedWriter(new FileWriter(receiptFile, true));				           
+						
+						   System.out.println( "---Return BOOOK RECEIPT--- \n" +
+						             "Student ID: " + arr[0] + "*" + "\n" +
+						             "Student Name: " + arr[1] + "*" + "\n" +
+						             "Book ID" + arr[2] +  "*" + "\n" +
+						             "Book Title: " + arr[3] +  "*" + "\n" +
+						             "Book Author: " + arr[4] +  "*" + "\n" +
+						             "Penalty: " + totalPenalty ) ;
+						   
+						   	System.out.println("THANKS FOR RETURNING OUR BOOK/S");
+						   	
+				           ReceiptWriter.write( "---Return BOOOK RECEIPT--- \n" +
+				           "Student ID: " + arr[0] + "*" + "\n" +
+				           "Student Name: " + arr[1] + "*" + "\n" +
+				           "Book ID" + arr[2] +  "*" + "\n" +
+				           "Book Title: " + arr[3] +  "*" + "\n" +
+				           "Book Author: " + arr[4] +  "*" + "\n" +
+				           "Penalty: " + totalPenalty) ;
+				           
+				           ReceiptWriter.close();
+
+						limit--;
+					}
+
+				}	borrowreader.close();
+
+		}//else if
+		else {
+			System.out.println("INVALID BOOK ID GIVEN TRY AGAIN");
+		}
+		
+
+	}
